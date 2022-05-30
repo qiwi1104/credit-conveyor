@@ -1,0 +1,5 @@
+package qiwi.conveyor.enums;
+
+public enum Position {
+    GRASSROOTS, MANAGER, TOP_MANAGER
+}
