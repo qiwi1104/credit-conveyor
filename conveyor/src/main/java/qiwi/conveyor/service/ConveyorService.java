@@ -17,8 +17,27 @@ public class ConveyorService {
     private final BigDecimal BASE_RATE = new BigDecimal(14).setScale(10, RoundingMode.HALF_UP);
     private final BigDecimal INSURANCE_COST = new BigDecimal(100000).setScale(10, RoundingMode.HALF_UP);
 
+    private final BigDecimal CHANGE_IF_INSURANCE_ENABLED = new BigDecimal("3");
+    private final BigDecimal CHANGE_IF_SALARY_CLIENT = BigDecimal.ONE;
+    private final BigDecimal CHANGE_IF_MANAGER = BigDecimal.ONE;
+    private final BigDecimal CHANGE_IF_TOP_MANAGER = new BigDecimal("4");
+    private final BigDecimal CHANGE_IF_SINGLE = BigDecimal.ONE;
+    private final BigDecimal CHANGE_IF_MARRIED = BigDecimal.ONE;
+    private final BigDecimal CHANGE_IF_MANY_DEPENDENTS = BigDecimal.ONE;
+    private final BigDecimal CHANGE_IF_GROWN_ENOUGH = new BigDecimal("2");
+    private final BigDecimal CHANGE_IF_NON_BINARY = BigDecimal.ONE;
+
+    private final int MAX_DEPENDENT_AMOUNT_WITHOUT_RATE_INCREASE = 1;
+    private final int MIN_MALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 30;
+    private final int MAX_MALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 55;
+    private final int MIN_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 35;
+    private final int MAX_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 60;
+    private final int MIN_ELIGIBLE_AGE = 20;
+    private final int MAX_ELIGIBLE_AGE = 60;
+    private final BigDecimal MAX_ALLOWED_TIMES_AMOUNT_GREATER_THAN_SALARY = new BigDecimal("20");
+
     private boolean isValidLoanApplicationRequest(LoanApplicationRequestDTO loanApplicationRequest) {
-        boolean isValid = !loanApplicationRequest.getBirthdate().plusYears(18).isAfter(LocalDate.now());
+        boolean isValid = !loanApplicationRequest.getBirthdate().plusYears(MIN_ELIGIBLE_AGE).isAfter(LocalDate.now());
 
         if (isValid) {
             if (loanApplicationRequest.getMiddleName() != null) {
@@ -53,49 +72,57 @@ public class ConveyorService {
         credit.setRate(BASE_RATE);
 
         if (credit.isInsuranceEnabled()) {
-            credit.setRate(credit.getRate().subtract(new BigDecimal(3)));
+            credit.setRate(credit.getRate().subtract(CHANGE_IF_INSURANCE_ENABLED));
         }
         if (credit.isSalaryClient()) {
-            credit.setRate(credit.getRate().subtract(BigDecimal.ONE));
+            credit.setRate(credit.getRate().subtract(CHANGE_IF_SALARY_CLIENT));
         }
 
         switch (scoringData.getEmployment().getPosition()) {
             case MANAGER:
-                credit.setRate(credit.getRate().subtract(BigDecimal.ONE));
+                credit.setRate(credit.getRate().subtract(CHANGE_IF_MANAGER));
                 break;
             case TOP_MANAGER:
-                credit.setRate(credit.getRate().subtract(new BigDecimal(4)));
+                credit.setRate(credit.getRate().subtract(CHANGE_IF_TOP_MANAGER));
                 break;
         }
 
         switch (scoringData.getMaritalStatus()) {
             case SINGLE:
-                credit.setRate(credit.getRate().add(BigDecimal.ONE));
+                credit.setRate(credit.getRate().add(CHANGE_IF_SINGLE));
                 break;
             case MARRIED:
-                credit.setRate(credit.getRate().subtract(BigDecimal.ONE));
+                credit.setRate(credit.getRate().subtract(CHANGE_IF_MARRIED));
                 break;
         }
 
-        if (scoringData.getDependentAmount() > 1) {
-            credit.setRate(credit.getRate().add(BigDecimal.ONE));
+        if (scoringData.getDependentAmount() > MAX_DEPENDENT_AMOUNT_WITHOUT_RATE_INCREASE) {
+            credit.setRate(credit.getRate().add(CHANGE_IF_MANY_DEPENDENTS));
         }
 
         switch (scoringData.getGender()) {
             case MALE:
-                if (scoringData.getBirthdate().plusYears(30).isAfter(LocalDate.now())
-                        || scoringData.getBirthdate().plusYears(55).isBefore(LocalDate.now())) {
-                    credit.setRate(credit.getRate().subtract(new BigDecimal(2)));
+                if (scoringData.getBirthdate()
+                        .plusYears(MIN_MALE_AGE_ELIGIBLE_FOR_RATE_DECREASE)
+                        .isAfter(LocalDate.now())
+                        || scoringData.getBirthdate()
+                        .plusYears(MAX_MALE_AGE_ELIGIBLE_FOR_RATE_DECREASE)
+                        .isBefore(LocalDate.now())) {
+                    credit.setRate(credit.getRate().subtract(CHANGE_IF_GROWN_ENOUGH));
                 }
                 break;
             case FEMALE:
-                if (scoringData.getBirthdate().plusYears(35).isAfter(LocalDate.now())
-                        || scoringData.getBirthdate().plusYears(60).isBefore(LocalDate.now())) {
-                    credit.setRate(credit.getRate().subtract(new BigDecimal(2)));
+                if (scoringData.getBirthdate()
+                        .plusYears(MIN_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE)
+                        .isAfter(LocalDate.now())
+                        || scoringData.getBirthdate()
+                        .plusYears(MAX_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE)
+                        .isBefore(LocalDate.now())) {
+                    credit.setRate(credit.getRate().subtract(CHANGE_IF_GROWN_ENOUGH));
                 }
                 break;
             case NON_BINARY:
-                credit.setRate(credit.getRate().add(BigDecimal.ONE));
+                credit.setRate(credit.getRate().add(CHANGE_IF_NON_BINARY));
                 break;
         }
     }
@@ -105,20 +132,11 @@ public class ConveyorService {
         EmploymentDTO employment = scoringData.getEmployment();
 
         if (employment.getEmploymentStatus().equals(UNEMPLOYED)
-                || scoringData.getAmount().compareTo(employment.getSalary().multiply(new BigDecimal(20))) == 1
-                || scoringData.getBirthdate().plusYears(20).isAfter(LocalDate.now())
-                || scoringData.getBirthdate().plusYears(60).isBefore(LocalDate.now())) {
+                || scoringData.getAmount().compareTo(
+                employment.getSalary().multiply(MAX_ALLOWED_TIMES_AMOUNT_GREATER_THAN_SALARY)) == 1
+                || scoringData.getBirthdate().plusYears(MIN_ELIGIBLE_AGE).isAfter(LocalDate.now())
+                || scoringData.getBirthdate().plusYears(MAX_ELIGIBLE_AGE).isBefore(LocalDate.now())) {
             isValid = false;
-        }
-
-        if (isValid) {
-            if (scoringData.getMiddleName() != null) {
-                if (!scoringData.getMiddleName().matches("[A-Za-z]+")
-                        || scoringData.getMiddleName().length() < 2
-                        || scoringData.getMiddleName().length() > 30) {
-                    isValid = false;
-                }
-            }
         }
 
         return isValid;
@@ -192,15 +210,16 @@ public class ConveyorService {
                 false, false, BASE_RATE.setScale(2, RoundingMode.HALF_UP));
 
         LoanOfferDTO loanOffer2 = generateSingleLoanOffer(loanApplicationRequest,
-                false, true, BASE_RATE.subtract(BigDecimal.ONE)
+                false, true, BASE_RATE.subtract(CHANGE_IF_SALARY_CLIENT)
                         .setScale(2, RoundingMode.HALF_UP));
 
         LoanOfferDTO loanOffer3 = generateSingleLoanOffer(loanApplicationRequest,
-                true, false, BASE_RATE.subtract(new BigDecimal(3))
+                true, false, BASE_RATE.subtract(CHANGE_IF_INSURANCE_ENABLED)
                         .setScale(2, RoundingMode.HALF_UP));
 
         LoanOfferDTO loanOffer4 = generateSingleLoanOffer(loanApplicationRequest,
-                true, true, BASE_RATE.subtract(new BigDecimal(4))
+                true, true, BASE_RATE.subtract(
+                                CHANGE_IF_INSURANCE_ENABLED.add(CHANGE_IF_SALARY_CLIENT))
                         .setScale(2, RoundingMode.HALF_UP));
 
         List<LoanOfferDTO> loanOffers = Arrays.asList(loanOffer1, loanOffer2, loanOffer3, loanOffer4);
