@@ -1,5 +1,6 @@
 package qiwi.conveyor.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class ConveyorController {
     @Autowired
     private ConveyorService service;
 
+    @Operation(summary = "create loan offers")
     @PostMapping("/conveyor/offers")
     public ResponseEntity<List<LoanOfferDTO>> createOffers(
             @Valid @RequestBody LoanApplicationRequestDTO loanApplicationRequestDTO, BindingResult result) {
@@ -39,6 +41,7 @@ public class ConveyorController {
         return new ResponseEntity<>(service.getLoanOffers(loanApplicationRequestDTO, result), HttpStatus.OK);
     }
 
+    @Operation(summary = "create credit")
     @PostMapping("/conveyor/calculation")
     public ResponseEntity<CreditDTO> createCredit(
             @Valid @RequestBody ScoringDataDTO scoringDataDTO, BindingResult result) {

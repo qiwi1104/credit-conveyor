@@ -1,5 +1,6 @@
 package qiwi.conveyor.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import qiwi.conveyor.dto.*;
@@ -13,6 +14,7 @@ import java.util.*;
 import static qiwi.conveyor.enums.EmploymentStatus.UNEMPLOYED;
 
 @Service
+@Log4j2
 public class ConveyorService {
     private final BigDecimal BASE_RATE = new BigDecimal(14).setScale(10, RoundingMode.HALF_UP);
     private final BigDecimal INSURANCE_COST = new BigDecimal(100000).setScale(10, RoundingMode.HALF_UP);
@@ -125,6 +127,8 @@ public class ConveyorService {
                 credit.setRate(credit.getRate().add(CHANGE_IF_NON_BINARY));
                 break;
         }
+
+        log.trace("Credit rate={}", credit.getRate());
     }
 
     private boolean isValidScoringData(ScoringDataDTO scoringData) {
@@ -139,15 +143,29 @@ public class ConveyorService {
             isValid = false;
         }
 
+        if (isValid) {
+            if (scoringData.getMiddleName() != null) {
+                if (!scoringData.getMiddleName().matches("[A-Za-z]+")
+                        || scoringData.getMiddleName().length() < 2
+                        || scoringData.getMiddleName().length() > 30) {
+                    isValid = false;
+                }
+            }
+        }
+
         return isValid;
     }
 
     private void calculatePayments(CreditDTO credit) {
+        log.trace("Calculating payment schedule.");
+
         BigDecimal monthlyInterest = credit.getRate()
                 .divide(BigDecimal.valueOf(100 * 12), RoundingMode.HALF_UP);
         BigDecimal monthlyPayment = calculateMonthlyPayment(credit.getAmount(), credit.getRate(), credit.getTerm());
 
         credit.setMonthlyPayment(monthlyPayment.setScale(2, RoundingMode.HALF_UP));
+
+        log.trace("Monthly payment={}", credit.getMonthlyPayment());
 
         BigDecimal remainingDebt = credit.getAmount();
         BigDecimal psk = BigDecimal.ZERO;
@@ -172,9 +190,13 @@ public class ConveyorService {
             credit.getPaymentSchedule().add(payment);
 
             psk = psk.add(payment.getTotalPayment());
+
+            log.trace(payment);
         }
 
         credit.setPsk(psk.setScale(2, RoundingMode.HALF_UP));
+
+        log.trace("psk={}", credit.getPsk());
     }
 
     private LoanOfferDTO generateSingleLoanOffer(LoanApplicationRequestDTO loanApplicationRequest,
@@ -202,6 +224,7 @@ public class ConveyorService {
                 .multiply(new BigDecimal(loanOffer.getTerm()))
                 .setScale(2, RoundingMode.HALF_UP));
 
+        log.trace("Loan offer generated: {}.", loanOffer);
         return loanOffer;
     }
 
@@ -230,17 +253,26 @@ public class ConveyorService {
 
     public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequest,
                                             BindingResult result) {
+        log.trace("Received loan application request: {}.", loanApplicationRequest);
         boolean isValid = !result.hasErrors() && isValidLoanApplicationRequest(loanApplicationRequest);
 
-        return isValid
-                ? generateLoanOffers(loanApplicationRequest)
-                : List.of(new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO());
+        if (isValid) {
+            log.trace("Loan application request is valid.");
+            return generateLoanOffers(loanApplicationRequest);
+        } else {
+            log.trace("Loan application request is not valid.");
+            return List.of(new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO());
+        }
     }
 
     public CreditDTO getCredit(ScoringDataDTO scoringData, BindingResult result) {
+        log.trace("Received scoring data: {}.", scoringData);
         if (result.hasErrors() || !isValidScoringData(scoringData)) {
+            log.trace("Scoring data is not valid.");
             return new CreditDTO();
         }
+
+        log.trace("Scoring data is valid.");
 
         CreditDTO credit = new CreditDTO();
 

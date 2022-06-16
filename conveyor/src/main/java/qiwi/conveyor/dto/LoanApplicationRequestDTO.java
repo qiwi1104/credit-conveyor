@@ -1,12 +1,14 @@
 package qiwi.conveyor.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@ToString
 public class LoanApplicationRequestDTO {
     @DecimalMin("10000")
     @NotNull

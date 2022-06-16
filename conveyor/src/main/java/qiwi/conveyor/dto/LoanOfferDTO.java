@@ -1,10 +1,12 @@
 package qiwi.conveyor.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Data
+@ToString
 public class LoanOfferDTO {
     private long applicationId;
     private BigDecimal requestedAmount;

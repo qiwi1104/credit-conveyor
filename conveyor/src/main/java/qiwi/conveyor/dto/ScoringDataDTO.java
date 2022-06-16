@@ -1,6 +1,7 @@
 package qiwi.conveyor.dto;
 
 import lombok.Data;
+import lombok.ToString;
 import qiwi.conveyor.enums.Gender;
 import qiwi.conveyor.enums.MaritalStatus;
 
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@ToString
 public class ScoringDataDTO {
     @DecimalMin("10000")
     @NotNull
