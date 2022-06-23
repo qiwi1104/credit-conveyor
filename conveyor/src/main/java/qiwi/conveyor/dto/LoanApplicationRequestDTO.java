@@ -10,12 +10,10 @@ import java.time.LocalDate;
 @Data
 @ToString
 public class LoanApplicationRequestDTO {
-    @DecimalMin("10000")
     @NotNull
     private BigDecimal amount;
-    @Min(6)
     @NotNull
-    private int term;
+    private Integer term;
     @Size(min = 2, max = 30)
     @Pattern(regexp = "[A-Za-z]+")
     @NotNull

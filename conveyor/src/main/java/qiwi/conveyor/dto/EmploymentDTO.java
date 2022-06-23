@@ -18,10 +18,8 @@ public class EmploymentDTO {
     private BigDecimal salary;
     @NotNull
     private Position position;
-    @Min(12)
     @NotNull
-    private int workExperienceTotal;
-    @Min(3)
+    private Integer workExperienceTotal;
     @NotNull
-    private int workExperienceCurrent;
+    private Integer workExperienceCurrent;
 }

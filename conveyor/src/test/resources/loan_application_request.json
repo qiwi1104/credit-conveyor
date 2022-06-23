@@ -1,0 +1,11 @@
+{
+  "amount": 800000,
+  "term": 24,
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "middleName": "middleName",
+  "email": "test@gmail.com",
+  "birthdate": "2001-04-11",
+  "passportSeries": "6314",
+  "passportNumber": "128312"
+}

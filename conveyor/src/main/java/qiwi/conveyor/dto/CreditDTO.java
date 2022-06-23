@@ -8,11 +8,11 @@ import java.util.List;
 @Data
 public class CreditDTO {
     private BigDecimal amount;
-    private int term;
+    private Integer term;
     private BigDecimal monthlyPayment;
     private BigDecimal rate;
     private BigDecimal psk;
-    private boolean isInsuranceEnabled;
-    private boolean isSalaryClient;
+    private Boolean isInsuranceEnabled;
+    private Boolean isSalaryClient;
     private List<PaymentScheduleElement> paymentSchedule;
 }

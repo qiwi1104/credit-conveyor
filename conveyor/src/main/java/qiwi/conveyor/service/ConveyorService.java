@@ -4,14 +4,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import qiwi.conveyor.dto.*;
+import qiwi.conveyor.validators.LoanApplicationRequestValidator;
+import qiwi.conveyor.validators.ScoringDataValidator;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
-
-import static qiwi.conveyor.enums.EmploymentStatus.UNEMPLOYED;
 
 @Service
 @Log4j2
@@ -34,24 +34,31 @@ public class ConveyorService {
     private final int MAX_MALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 55;
     private final int MIN_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 35;
     private final int MAX_FEMALE_AGE_ELIGIBLE_FOR_RATE_DECREASE = 60;
-    private final int MIN_ELIGIBLE_AGE = 20;
-    private final int MAX_ELIGIBLE_AGE = 60;
-    private final BigDecimal MAX_ALLOWED_TIMES_AMOUNT_GREATER_THAN_SALARY = new BigDecimal("20");
+    private final int MIN_NAME_LENGTH = 2;
+    private final int MAX_NAME_LENGTH = 30;
 
-    private boolean isValidLoanApplicationRequest(LoanApplicationRequestDTO loanApplicationRequest) {
-        boolean isValid = !loanApplicationRequest.getBirthdate().plusYears(MIN_ELIGIBLE_AGE).isAfter(LocalDate.now());
-
-        if (isValid) {
-            if (loanApplicationRequest.getMiddleName() != null) {
-                if (!loanApplicationRequest.getMiddleName().matches("[A-Za-z]+")
-                        || loanApplicationRequest.getMiddleName().length() < 2
-                        || loanApplicationRequest.getMiddleName().length() > 30) {
-                    isValid = false;
-                }
-            }
+    public boolean isValidMiddleName(String middleName) {
+        if (middleName != null) {
+            return middleName.matches("[A-Za-z]+")
+                    && middleName.length() >= MIN_NAME_LENGTH
+                    && middleName.length() <= MAX_NAME_LENGTH;
         }
 
-        return isValid;
+        return true;
+    }
+
+    private boolean prescoringPassed(LoanApplicationRequestDTO loanApplicationRequest, BindingResult result) {
+        LoanApplicationRequestValidator applicationRequestValidator = new LoanApplicationRequestValidator();
+        applicationRequestValidator.validate(loanApplicationRequest, result);
+
+        return !result.hasErrors();
+    }
+
+    private boolean scoringPassed(ScoringDataDTO scoringData, BindingResult result) {
+        ScoringDataValidator scoringDataValidator = new ScoringDataValidator();
+        scoringDataValidator.validate(scoringData, result);
+
+        return !result.hasErrors();
     }
 
     private BigDecimal calculateMonthlyPayment(BigDecimal amount, BigDecimal rate, int term) {
@@ -73,10 +80,10 @@ public class ConveyorService {
     private void calculateRate(CreditDTO credit, ScoringDataDTO scoringData) {
         credit.setRate(BASE_RATE);
 
-        if (credit.isInsuranceEnabled()) {
+        if (credit.getIsInsuranceEnabled()) {
             credit.setRate(credit.getRate().subtract(CHANGE_IF_INSURANCE_ENABLED));
         }
-        if (credit.isSalaryClient()) {
+        if (credit.getIsSalaryClient()) {
             credit.setRate(credit.getRate().subtract(CHANGE_IF_SALARY_CLIENT));
         }
 
@@ -131,31 +138,6 @@ public class ConveyorService {
         log.trace("Credit rate={}", credit.getRate());
     }
 
-    private boolean isValidScoringData(ScoringDataDTO scoringData) {
-        boolean isValid = true;
-        EmploymentDTO employment = scoringData.getEmployment();
-
-        if (employment.getEmploymentStatus().equals(UNEMPLOYED)
-                || scoringData.getAmount().compareTo(
-                employment.getSalary().multiply(MAX_ALLOWED_TIMES_AMOUNT_GREATER_THAN_SALARY)) == 1
-                || scoringData.getBirthdate().plusYears(MIN_ELIGIBLE_AGE).isAfter(LocalDate.now())
-                || scoringData.getBirthdate().plusYears(MAX_ELIGIBLE_AGE).isBefore(LocalDate.now())) {
-            isValid = false;
-        }
-
-        if (isValid) {
-            if (scoringData.getMiddleName() != null) {
-                if (!scoringData.getMiddleName().matches("[A-Za-z]+")
-                        || scoringData.getMiddleName().length() < 2
-                        || scoringData.getMiddleName().length() > 30) {
-                    isValid = false;
-                }
-            }
-        }
-
-        return isValid;
-    }
-
     private void calculatePayments(CreditDTO credit) {
         log.trace("Calculating payment schedule.");
 
@@ -201,20 +183,18 @@ public class ConveyorService {
 
     private LoanOfferDTO generateSingleLoanOffer(LoanApplicationRequestDTO loanApplicationRequest,
                                                  boolean isInsuranceEnabled, boolean isSalaryClient, BigDecimal rate) {
-        LoanOfferDTO loanOffer = new LoanOfferDTO();
+        LoanOfferDTO loanOffer = LoanOfferDTO.builder()
+                .term(loanApplicationRequest.getTerm())
+                .isInsuranceEnabled(isInsuranceEnabled)
+                .isSalaryClient(isSalaryClient)
+                .rate(rate.setScale(2, RoundingMode.HALF_UP))
+                .requestedAmount(
+                        isInsuranceEnabled
+                                ? loanApplicationRequest.getAmount()
+                                .add(INSURANCE_COST).setScale(2, RoundingMode.HALF_UP)
+                                : loanApplicationRequest.getAmount().setScale(2, RoundingMode.HALF_UP))
+                .build();
 
-        if (isInsuranceEnabled) {
-            loanOffer.setRequestedAmount(
-                    loanApplicationRequest.getAmount()
-                            .add(INSURANCE_COST)
-                            .setScale(2, RoundingMode.HALF_UP));
-        } else {
-            loanOffer.setRequestedAmount(loanApplicationRequest.getAmount().setScale(2, RoundingMode.HALF_UP));
-        }
-        loanOffer.setTerm(loanApplicationRequest.getTerm());
-        loanOffer.setInsuranceEnabled(isInsuranceEnabled);
-        loanOffer.setSalaryClient(isSalaryClient);
-        loanOffer.setRate(rate.setScale(2, RoundingMode.HALF_UP));
         loanOffer.setMonthlyPayment(calculateMonthlyPayment(
                 loanOffer.getRequestedAmount(),
                 loanOffer.getRate().setScale(10, RoundingMode.HALF_UP),
@@ -254,35 +234,34 @@ public class ConveyorService {
     public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequest,
                                             BindingResult result) {
         log.trace("Received loan application request: {}.", loanApplicationRequest);
-        boolean isValid = !result.hasErrors() && isValidLoanApplicationRequest(loanApplicationRequest);
 
-        if (isValid) {
-            log.trace("Loan application request is valid.");
+        if (prescoringPassed(loanApplicationRequest, result)) {
+            log.trace("Loan application request has passed pre-scoring.");
             return generateLoanOffers(loanApplicationRequest);
         } else {
-            log.trace("Loan application request is not valid.");
-            return List.of(new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO(), new LoanOfferDTO());
+            log.trace("Loan application request has not passed pre-scoring.");
+            return new ArrayList<>();
         }
     }
 
     public CreditDTO getCredit(ScoringDataDTO scoringData, BindingResult result) {
         log.trace("Received scoring data: {}.", scoringData);
-        if (result.hasErrors() || !isValidScoringData(scoringData)) {
-            log.trace("Scoring data is not valid.");
-            return new CreditDTO();
-        }
-
-        log.trace("Scoring data is valid.");
 
         CreditDTO credit = new CreditDTO();
 
-        credit.setAmount(scoringData.getAmount());
-        credit.setTerm(scoringData.getTerm());
-        credit.setInsuranceEnabled(scoringData.isInsuranceEnabled());
-        credit.setSalaryClient(scoringData.isSalaryClient());
+        if (scoringPassed(scoringData, result)) {
+            log.trace("Scoring data is valid.");
 
-        calculateRate(credit, scoringData);
-        calculatePayments(credit);
+            credit.setAmount(scoringData.getAmount());
+            credit.setTerm(scoringData.getTerm());
+            credit.setIsInsuranceEnabled(scoringData.getIsInsuranceEnabled());
+            credit.setIsSalaryClient(scoringData.getIsSalaryClient());
+
+            calculateRate(credit, scoringData);
+            calculatePayments(credit);
+        } else {
+            log.trace("Scoring data is not valid.");
+        }
 
         return credit;
     }

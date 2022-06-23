@@ -1,19 +1,21 @@
 package qiwi.conveyor.dto;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Data
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoanOfferDTO {
-    private long applicationId;
+    private Long applicationId;
     private BigDecimal requestedAmount;
     private BigDecimal totalAmount;
-    private int term;
+    private Integer term;
     private BigDecimal monthlyPayment;
     private BigDecimal rate;
-    private boolean isInsuranceEnabled;
-    private boolean isSalaryClient;
+    private Boolean isInsuranceEnabled;
+    private Boolean isSalaryClient;
 }

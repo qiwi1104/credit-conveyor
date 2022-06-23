@@ -13,12 +13,10 @@ import java.time.LocalDate;
 @Data
 @ToString
 public class ScoringDataDTO {
-    @DecimalMin("10000")
     @NotNull
     private BigDecimal amount;
-    @Min(6)
     @NotNull
-    private int term;
+    private Integer term;
     @Size(min = 2, max = 30)
     @Pattern(regexp = "[A-Za-z]+")
     @NotNull
@@ -46,13 +44,12 @@ public class ScoringDataDTO {
     private MaritalStatus maritalStatus;
     @NotNull
     private int dependentAmount;
-    @Valid
     @NotNull
     private EmploymentDTO employment;
     @NotNull
     private String account;
     @NotNull
-    private boolean isInsuranceEnabled;
+    private Boolean isInsuranceEnabled;
     @NotNull
-    private boolean isSalaryClient;
+    private Boolean isSalaryClient;
 }
