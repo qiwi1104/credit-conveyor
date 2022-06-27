@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import qiwi.conveyor.dto.*;
-import qiwi.conveyor.handler.Response;
+import qiwi.conveyor.dto.ErrorMessageDTO;
 import qiwi.conveyor.service.ConveyorService;
 
 import java.io.File;
@@ -56,14 +56,14 @@ class ConveyorControllerTest {
     void testCreateOffersWhenNullField() {
         loanApplicationRequest.setFirstName(null);
 
-        Response expectedLoanOfferResponse = new Response("Error on fields: "
+        ErrorMessageDTO expectedLoanOfferResponse = new ErrorMessageDTO("Error on fields: "
                 + Arrays.toString(List.of("firstName").toArray()));
 
-        ResponseEntity<Response> response = restTemplate
+        ResponseEntity<ErrorMessageDTO> response = restTemplate
                 .postForEntity(
                         "/conveyor/offers",
                         loanApplicationRequest,
-                        Response.class);
+                        ErrorMessageDTO.class);
 
         assertTrue(response.getStatusCode().is4xxClientError());
         assertEquals(expectedLoanOfferResponse, response.getBody());
@@ -85,14 +85,14 @@ class ConveyorControllerTest {
     void testCreateCreditWhenNullField() {
         scoringDataRequest.setAmount(null);
 
-        Response expectedCreditResponse = new Response("Error on fields: "
+        ErrorMessageDTO expectedCreditResponse = new ErrorMessageDTO("Error on fields: "
                 + Arrays.toString(List.of("amount").toArray()));
 
-        ResponseEntity<Response> response = restTemplate
+        ResponseEntity<ErrorMessageDTO> response = restTemplate
                 .postForEntity(
                         "/conveyor/calculation",
                         scoringDataRequest,
-                        Response.class);
+                        ErrorMessageDTO.class);
 
         assertTrue(response.getStatusCode().is4xxClientError());
         assertEquals(expectedCreditResponse, response.getBody());

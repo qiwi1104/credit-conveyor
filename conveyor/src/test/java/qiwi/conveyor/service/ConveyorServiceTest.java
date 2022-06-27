@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.validation.BindingResult;
 import qiwi.conveyor.dto.*;
 import qiwi.conveyor.enums.EmploymentStatus;
+import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
+import qiwi.conveyor.exceptions.InvalidScoringDataException;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,44 +46,39 @@ class ConveyorServiceTest {
 
     @Test
     void testLoanOffersWithUnacceptableAmount() {
-
         loanApplicationRequest.setAmount(new BigDecimal("9000"));
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
 
     @Test
     void testLoanOffersWithUnacceptableTerm() {
-
         loanApplicationRequest.setTerm(3);
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
 
     @Test
     void testLoanOffersWithUnacceptableFirstName() {
-
         loanApplicationRequest.setFirstName("a");
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
 
     @Test
     void testLoanOffersWithUnacceptableMiddleName() {
-
         if (loanApplicationRequest.getMiddleName() != null) {
             loanApplicationRequest.setMiddleName("a");
-            testLoanOffersWithUnacceptableData(loanApplicationRequest);
+            assertThrows(InvalidLoanApplicationRequestException.class,
+                    () -> testLoanOffersWithUnacceptableData(loanApplicationRequest));
         }
     }
 
     @Test
     void testLoanOffersWithUnacceptableLastName() {
-
         loanApplicationRequest.setLastName("a");
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
 
     @Test
     void testLoanOffersWithUnacceptableEmail() {
-
         loanApplicationRequest.setEmail("a");
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
@@ -94,14 +91,12 @@ class ConveyorServiceTest {
 
     @Test
     void testLoanOffersWithUnacceptablePassportSeries() {
-
         loanApplicationRequest.setPassportSeries("a");
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
 
     @Test
     void testLoanOffersWithUnacceptablePassportNumber() {
-
         loanApplicationRequest.setPassportNumber("a");
         testLoanOffersWithUnacceptableData(loanApplicationRequest);
     }
@@ -150,7 +145,8 @@ class ConveyorServiceTest {
     void testCreditWithUnacceptableMiddleName() {
         if (scoringDataRequest.getMiddleName() != null) {
             scoringDataRequest.setMiddleName("a");
-            testCreditWithUnacceptableData(scoringDataRequest);
+            assertThrows(InvalidScoringDataException.class,
+                    () -> testCreditWithUnacceptableData(scoringDataRequest));
         }
     }
 

@@ -1,4 +1,4 @@
-package qiwi.conveyor.handler;
+package qiwi.conveyor.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response {
+public class ErrorMessageDTO {
     private String message;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Response)) return false;
+        if (!(o instanceof ErrorMessageDTO)) return false;
 
-        Response response = (Response) o;
+        ErrorMessageDTO response = (ErrorMessageDTO) o;
 
         return message.equals(response.message);
     }

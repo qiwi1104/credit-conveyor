@@ -3,7 +3,10 @@ package qiwi.conveyor.service;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import qiwi.conveyor.dto.*;
+import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
+import qiwi.conveyor.exceptions.InvalidScoringDataException;
 import qiwi.conveyor.validators.LoanApplicationRequestValidator;
 import qiwi.conveyor.validators.ScoringDataValidator;
 
@@ -12,6 +15,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -45,6 +49,40 @@ public class ConveyorService {
         }
 
         return true;
+    }
+
+    public void isErrorsPresent(LoanApplicationRequestDTO loanApplicationRequestDTO, BindingResult result) {
+        List<String> fields = result.getFieldErrors().stream()
+                .map(FieldError::getField)
+                .collect(Collectors.toList());
+
+        if (!isValidMiddleName(loanApplicationRequestDTO.getMiddleName())) {
+            fields.add("middleName");
+        }
+
+        if (!fields.isEmpty()) {
+            log.trace("Error on fields: {}", fields);
+
+            throw new InvalidLoanApplicationRequestException("Error on fields: "
+                    + Arrays.toString(fields.toArray()));
+        }
+    }
+
+    public void isErrorsPresent(ScoringDataDTO scoringDataDTO, BindingResult result) {
+        List<String> fields = result.getFieldErrors().stream()
+                .map(FieldError::getField)
+                .collect(Collectors.toList());
+
+        if (!isValidMiddleName(scoringDataDTO.getMiddleName())) {
+            fields.add("middleName");
+        }
+
+        if (!fields.isEmpty()) {
+            log.trace("Error on fields: {}", fields);
+
+            throw new InvalidScoringDataException("Error on fields: "
+                    + Arrays.toString(fields.toArray()));
+        }
     }
 
     private boolean prescoringPassed(LoanApplicationRequestDTO loanApplicationRequest, BindingResult result) {
@@ -235,6 +273,8 @@ public class ConveyorService {
                                             BindingResult result) {
         log.trace("Received loan application request: {}.", loanApplicationRequest);
 
+        isErrorsPresent(loanApplicationRequest, result);
+
         if (prescoringPassed(loanApplicationRequest, result)) {
             log.trace("Loan application request has passed pre-scoring.");
             return generateLoanOffers(loanApplicationRequest);
@@ -246,6 +286,8 @@ public class ConveyorService {
 
     public CreditDTO getCredit(ScoringDataDTO scoringData, BindingResult result) {
         log.trace("Received scoring data: {}.", scoringData);
+
+        isErrorsPresent(scoringData, result);
 
         CreditDTO credit = new CreditDTO();
 
