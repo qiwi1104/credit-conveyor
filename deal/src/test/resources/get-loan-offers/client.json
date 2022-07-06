@@ -1,0 +1,20 @@
+{
+  "id": 1,
+  "lastName": "lastName",
+  "firstName": "firstName",
+  "middleName": "middleName",
+  "birthDate": "2001-04-11",
+  "email": "test@gmail.com",
+  "gender": null,
+  "maritalStatus": null,
+  "dependentAmount": null,
+  "passport": {
+    "id": 1,
+    "series": 6314,
+    "number": 128312,
+    "issueDate": null,
+    "issueBranch": null
+  },
+  "employment": null,
+  "account": null
+}

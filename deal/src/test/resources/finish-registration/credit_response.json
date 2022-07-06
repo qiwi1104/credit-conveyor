@@ -1,0 +1,67 @@
+{
+  "amount": 800000,
+  "term": 7,
+  "monthlyPayment": 119291.45,
+  "rate": 13.0000000000,
+  "psk": 835040.15,
+  "paymentSchedule": [
+    {
+      "number": 1,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 8666.67,
+      "debtPayment": 110624.79,
+      "remainingDebt": 689375.21
+    },
+    {
+      "number": 2,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 7468.23,
+      "debtPayment": 111823.22,
+      "remainingDebt": 577551.99
+    },
+    {
+      "number": 3,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 6256.81,
+      "debtPayment": 113034.64,
+      "remainingDebt": 464517.35
+    },
+    {
+      "number": 4,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 5032.27,
+      "debtPayment": 114259.18,
+      "remainingDebt": 350258.17
+    },
+    {
+      "number": 5,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 3794.46,
+      "debtPayment": 115496.99,
+      "remainingDebt": 234761.18
+    },
+    {
+      "number": 6,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 2543.25,
+      "debtPayment": 116748.21,
+      "remainingDebt": 118012.98
+    },
+    {
+      "number": 7,
+      "date": "",
+      "totalPayment": 119291.45,
+      "interestPayment": 1278.47,
+      "debtPayment": 118012.98,
+      "remainingDebt": 0.00
+    }
+  ],
+  "isInsuranceEnabled": false,
+  "isSalaryClient": false
+}
