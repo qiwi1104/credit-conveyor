@@ -21,7 +21,7 @@ public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Long applicationId;
     @OneToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;

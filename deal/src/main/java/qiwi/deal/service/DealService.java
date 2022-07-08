@@ -9,12 +9,15 @@ import qiwi.conveyor.dto.*;
 import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
 import qiwi.conveyor.exceptions.InvalidScoringDataException;
 import qiwi.deal.client.ConveyorClient;
-import qiwi.deal.dto.*;
-import qiwi.deal.entity.*;
+import qiwi.deal.dto.FinishRegistrationRequestDTO;
 import qiwi.deal.entity.PaymentScheduleElement;
+import qiwi.deal.entity.*;
 import qiwi.deal.enums.Status;
 import qiwi.deal.exceptions.InvalidFinishRegistrationRequestException;
-import qiwi.deal.repository.*;
+import qiwi.deal.mapper.CreditMapper;
+import qiwi.deal.mapper.EmploymentMapper;
+import qiwi.deal.mapper.LoanOfferMapper;
+import qiwi.deal.mapper.PaymentScheduleElementMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,23 +34,18 @@ import static qiwi.deal.enums.Status.*;
 @Slf4j
 public class DealService {
     @Autowired
-    private ClientRepository clientRepository;
-    @Autowired
-    private PassportRepository passportRepository;
-    @Autowired
-    private ApplicationRepository applicationRepository;
-    @Autowired
-    private ApplicationsStatusHistoryRepository applicationsStatusHistoryRepository;
-    @Autowired
-    private LoanOffersRepository loanOffersRepository;
-    @Autowired
-    private CreditRepository creditRepository;
-    @Autowired
-    private PaymentsRepository paymentsRepository;
-    @Autowired
-    private EmploymentRepository employmentRepository;
+    private DataAccessService dataAccessService;
     @Autowired
     private ConveyorClient conveyorProxy;
+    @Autowired
+    private LoanOfferMapper loanOfferMapper;
+    @Autowired
+    private EmploymentMapper employmentMapper;
+    @Autowired
+    private PaymentScheduleElementMapper paymentScheduleElementMapper;
+    @Autowired
+    private CreditMapper creditMapper;
+
 
     private <T> void isErrorsPresent(T dtoRequest,
                                      BindingResult result) {
@@ -112,12 +110,12 @@ public class DealService {
                 .application(application)
                 .build();
 
-        saveApplicationStatus(applicationStatus);
+        dataAccessService.saveApplicationStatus(applicationStatus);
 
         application.setStatus(status);
         application.getApplicationStatusHistory().add(applicationStatus);
 
-        saveApplication(application);
+        dataAccessService.saveApplication(application);
 
         log.trace("Application status history updated: {}", application.getApplicationStatusHistory());
         log.trace("Application updated: {}", application);
@@ -127,7 +125,7 @@ public class DealService {
         Passport passport = client.getPassport();
         passport.setIssueDate(scoringData.getPassportIssueDate());
         passport.setIssueBranch(scoringData.getPassportIssueBranch());
-        savePassport(passport);
+        dataAccessService.savePassport(passport);
 
         log.trace("Passport updated: {}", passport);
 
@@ -140,7 +138,7 @@ public class DealService {
         Employment employment = createEmployment(scoringData.getEmployment());
         client.setEmployment(employment);
 
-        saveClient(client);
+        dataAccessService.saveClient(client);
 
         log.trace("Client updated: {}", client);
     }
@@ -157,7 +155,7 @@ public class DealService {
 
         for (qiwi.deal.entity.PaymentScheduleElement paymentScheduleElement : paymentScheduleElements) {
             paymentScheduleElement.setCredit(credit);
-            savePaymentElement(paymentScheduleElement);
+            dataAccessService.savePaymentElement(paymentScheduleElement);
         }
     }
 
@@ -166,7 +164,7 @@ public class DealService {
 
         log.trace("Applied offer set: {}", loanOffer);
 
-        saveApplication(application);
+        dataAccessService.saveApplication(application);
 
         log.trace("Application updated: {}", application);
     }
@@ -178,7 +176,7 @@ public class DealService {
                 .applicationStatusHistory(new ArrayList<>())
                 .build();
 
-        saveApplication(application);
+        dataAccessService.saveApplication(application);
 
         log.trace("Application created: {}", application);
 
@@ -186,18 +184,9 @@ public class DealService {
     }
 
     private LoanOffer createLoanOffer(LoanOfferDTO loanOfferDTO) {
-        LoanOffer loanOffer = LoanOffer.builder()
-                .applicationId(loanOfferDTO.getApplicationId())
-                .requestedAmount(loanOfferDTO.getRequestedAmount())
-                .totalAmount(loanOfferDTO.getTotalAmount())
-                .term(loanOfferDTO.getTerm())
-                .monthlyPayment(loanOfferDTO.getMonthlyPayment())
-                .rate(loanOfferDTO.getRate())
-                .isInsuranceEnabled(loanOfferDTO.getIsInsuranceEnabled())
-                .isSalaryClient(loanOfferDTO.getIsSalaryClient())
-                .build();
+        LoanOffer loanOffer = loanOfferMapper.mapToEntity(loanOfferDTO);
 
-        saveLoanOffer(loanOffer);
+        dataAccessService.saveLoanOffer(loanOffer);
 
         return loanOffer;
     }
@@ -207,22 +196,15 @@ public class DealService {
         passport.setSeries(loanApplicationRequest.getPassportSeries());
         passport.setNumber(loanApplicationRequest.getPassportNumber());
 
-        savePassport(passport);
+        dataAccessService.savePassport(passport);
 
         return passport;
     }
 
     private Employment createEmployment(EmploymentDTO employmentDTO) {
-        Employment employment = new Employment();
+        Employment employment = employmentMapper.mapToEntity(employmentDTO);
 
-        employment.setEmploymentStatus(employmentDTO.getEmploymentStatus());
-        employment.setEmployerINN(employmentDTO.getEmployerINN());
-        employment.setSalary(employmentDTO.getSalary());
-        employment.setPosition(employmentDTO.getPosition());
-        employment.setWorkExperienceTotal(employmentDTO.getWorkExperienceTotal());
-        employment.setWorkExperienceCurrent(employmentDTO.getWorkExperienceCurrent());
-
-        saveEmployment(employment);
+        dataAccessService.saveEmployment(employment);
 
         return employment;
     }
@@ -239,7 +221,7 @@ public class DealService {
                 .passport(passport)
                 .build();
 
-        saveClient(client);
+        dataAccessService.saveClient(client);
 
         log.trace("Client created: {}", client);
 
@@ -278,14 +260,8 @@ public class DealService {
         List<PaymentScheduleElement> paymentScheduleElements = new ArrayList<>();
 
         for (qiwi.conveyor.dto.PaymentScheduleElement paymentScheduleElementDTO : paymentScheduleElementsDTO) {
-            PaymentScheduleElement paymentScheduleElement = PaymentScheduleElement.builder()
-                    .number(paymentScheduleElementDTO.getNumber())
-                    .date(paymentScheduleElementDTO.getDate())
-                    .totalPayment(paymentScheduleElementDTO.getTotalPayment())
-                    .interestPayment(paymentScheduleElementDTO.getInterestPayment())
-                    .debtPayment(paymentScheduleElementDTO.getDebtPayment())
-                    .remainingDebt(paymentScheduleElementDTO.getRemainingDebt())
-                    .build();
+            PaymentScheduleElement paymentScheduleElement = paymentScheduleElementMapper
+                    .mapToEntity(paymentScheduleElementDTO);
 
             paymentScheduleElements.add(paymentScheduleElement);
         }
@@ -294,18 +270,10 @@ public class DealService {
     }
 
     private Credit createCredit(CreditDTO creditDTO) {
-        Credit credit = Credit.builder()
-                .amount(creditDTO.getAmount())
-                .term(creditDTO.getTerm())
-                .monthlyPayment(creditDTO.getMonthlyPayment())
-                .rate(creditDTO.getRate())
-                .psk(creditDTO.getPsk())
-                .isInsuranceEnabled(creditDTO.getIsInsuranceEnabled())
-                .isSalaryClient(creditDTO.getIsSalaryClient())
-                .creditStatus(CALCULATED)
-                .build();
+        Credit credit = creditMapper.mapToEntity(creditDTO);
+        credit.setCreditStatus(CALCULATED);
 
-        saveCredit(credit);
+        dataAccessService.saveCredit(credit);
 
         List<PaymentScheduleElement> paymentScheduleElements = createPaymentSchedule(
                 creditDTO.getPaymentSchedule());
@@ -315,47 +283,11 @@ public class DealService {
 
         log.trace("Payment schedule created: {}", paymentScheduleElements);
 
-        saveCredit(credit);
+        dataAccessService.saveCredit(credit);
 
         log.trace("Credit created: {}", credit);
 
         return credit;
-    }
-
-    public void saveClient(Client client) {
-        clientRepository.save(client);
-    }
-
-    public void saveApplication(Application application) {
-        applicationRepository.save(application);
-    }
-
-    public void saveApplicationStatus(ApplicationStatusHistory applicationStatus) {
-        applicationsStatusHistoryRepository.save(applicationStatus);
-    }
-
-    public void saveLoanOffer(LoanOffer loanOffer) {
-        loanOffersRepository.save(loanOffer);
-    }
-
-    public void saveCredit(Credit credit) {
-        creditRepository.save(credit);
-    }
-
-    public void savePassport(Passport passport) {
-        passportRepository.save(passport);
-    }
-
-    public void savePaymentElement(qiwi.deal.entity.PaymentScheduleElement paymentScheduleElement) {
-        paymentsRepository.save(paymentScheduleElement);
-    }
-
-    public void saveEmployment(Employment employment) {
-        employmentRepository.save(employment);
-    }
-
-    public Application getApplicationById(Long id) {
-        return applicationRepository.findById(id).get();
     }
 
     public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequest,
@@ -372,7 +304,7 @@ public class DealService {
         Application application = createApplication(client);
         updateApplicationStatus(application, PREAPPROVAL);
 
-        setIdToLoanOffers(loanOffers, application.getId());
+        setIdToLoanOffers(loanOffers, application.getApplicationId());
 
         return loanOffers;
     }
@@ -380,7 +312,7 @@ public class DealService {
     public void chooseOffer(LoanOfferDTO loanOfferDTO) {
         isErrorsPresent(loanOfferDTO);
 
-        Application application = getApplicationById(loanOfferDTO.getApplicationId());
+        Application application = dataAccessService.getApplicationById(loanOfferDTO.getApplicationId());
 
         log.trace("Application retrieved by id = {}: {}",
                 loanOfferDTO.getApplicationId(), application);
@@ -395,7 +327,7 @@ public class DealService {
                                    BindingResult result, Long id) {
         isErrorsPresent(finishRegistrationRequest, result);
 
-        Application application = getApplicationById(id);
+        Application application = dataAccessService.getApplicationById(id);
 
         log.trace("Application retrieved by id = {}: {}", id, application);
 

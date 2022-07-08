@@ -35,7 +35,7 @@ public class DealController {
     }
 
     @Operation(summary = "finish registration, complete credit calculation")
-    @PutMapping("/deal/calculate/{id}")
+    @PutMapping("/deal/calculate/{applicationId}")
     public void finishRegistration(@Valid @RequestBody FinishRegistrationRequestDTO finishRegistrationRequest,
                                    BindingResult result,
                                    @PathVariable Long id) {

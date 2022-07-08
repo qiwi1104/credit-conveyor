@@ -50,12 +50,14 @@ public class DealServiceTest {
     private ObjectMapper mapper;
     @Autowired
     private DealService service;
+    @Autowired
+    private DataAccessService dataAccessService;
     @MockBean
     private ConveyorClient client;
 
     private void assertOffersHaveApplicationId(List<LoanOfferDTO> loanOffers, Application application) {
         for (LoanOfferDTO loanOffer : loanOffers) {
-            assertEquals(application.getId(), loanOffer.getApplicationId());
+            assertEquals(application.getApplicationId(), loanOffer.getApplicationId());
         }
     }
 
@@ -141,7 +143,7 @@ public class DealServiceTest {
 
         assertArrayEquals(expectedLoanOfferResponse, loanOfferDTOS.toArray());
 
-        Application actualApplication = service.getApplicationById(1L);
+        Application actualApplication = dataAccessService.getApplicationById(1L);
 
         assertOffersHaveApplicationId(loanOfferDTOS, actualApplication);
         assertApplicationEquals(expectedApplicationOnGetLoanOffersStep, actualApplication);
@@ -164,7 +166,7 @@ public class DealServiceTest {
     void testChooseOffer() {
         expectedLoanOfferResponse[1].setApplicationId(1L);
         service.chooseOffer(expectedLoanOfferResponse[1]);
-        Application actualApplication = service.getApplicationById(1L);
+        Application actualApplication = dataAccessService.getApplicationById(1L);
 
         assertEquals(actualApplication.getStatus(), Status.APPROVED);
         assertAppliedOfferEquals(expectedApplicationOnChooseOfferStep.getAppliedOffer(),
@@ -192,7 +194,7 @@ public class DealServiceTest {
 
         service.finishRegistration(finishRegistrationRequest, result, 1L);
 
-        Application actualApplication = service.getApplicationById(1L);
+        Application actualApplication = dataAccessService.getApplicationById(1L);
 
         assertApplicationEquals(expectedApplicationOnFinishRegistrationStep, actualApplication);
     }
@@ -270,7 +272,7 @@ public class DealServiceTest {
     }
 
     private void setApplicationFields(Application application) {
-        application.setId(1L);
+        application.setApplicationId(1L);
         application.setCreationDate(LocalDate.now());
         application.getClient().setId(1L);
         application.getClient().getPassport().setId(1L);
