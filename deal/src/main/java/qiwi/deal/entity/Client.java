@@ -3,8 +3,8 @@ package qiwi.deal.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import qiwi.conveyor.enums.Gender;
-import qiwi.conveyor.enums.MaritalStatus;
+import qiwi.deal.enums.Gender;
+import qiwi.deal.enums.MaritalStatus;
 
 import javax.persistence.*;
 import java.time.LocalDate;

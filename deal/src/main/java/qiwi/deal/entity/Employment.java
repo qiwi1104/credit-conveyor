@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import qiwi.conveyor.enums.EmploymentStatus;
-import qiwi.conveyor.enums.Position;
+import qiwi.deal.enums.EmploymentStatus;
+import qiwi.deal.enums.Position;
 
 import javax.persistence.*;
 import java.math.BigDecimal;

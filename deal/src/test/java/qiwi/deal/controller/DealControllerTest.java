@@ -14,12 +14,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import qiwi.conveyor.dto.CreditDTO;
-import qiwi.conveyor.dto.ErrorMessageDTO;
-import qiwi.conveyor.dto.LoanApplicationRequestDTO;
-import qiwi.conveyor.dto.LoanOfferDTO;
+import qiwi.deal.dto.CreditDTO;
+import qiwi.deal.dto.ErrorMessageDTO;
+import qiwi.deal.dto.LoanApplicationRequestDTO;
+import qiwi.deal.dto.LoanOfferDTO;
 import qiwi.deal.client.ConveyorClient;
 import qiwi.deal.dto.FinishRegistrationRequestDTO;
+import qiwi.deal.service.DataAccessService;
 import qiwi.deal.service.DealService;
 
 import java.io.File;
@@ -50,6 +51,8 @@ public class DealControllerTest {
 
     @Autowired
     private DealService service;
+    @Autowired
+    private DataAccessService dataAccessService;
     @MockBean
     private ConveyorClient client;
 
@@ -167,7 +170,7 @@ public class DealControllerTest {
                 LoanOfferDTO[].class);
         expectedCreditResponse = loadExpectedResponse("finish-registration/credit_response.json",
                 CreditDTO.class);
-        for (qiwi.conveyor.dto.PaymentScheduleElement payment : expectedCreditResponse.getPaymentSchedule()) {
+        for (qiwi.deal.dto.PaymentScheduleElement payment : expectedCreditResponse.getPaymentSchedule()) {
             payment.setDate(LocalDate.now().plusMonths(payment.getNumber() - 1));
         }
 

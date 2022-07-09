@@ -3,10 +3,10 @@ package qiwi.deal.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import qiwi.conveyor.dto.CreditDTO;
-import qiwi.conveyor.dto.LoanApplicationRequestDTO;
-import qiwi.conveyor.dto.LoanOfferDTO;
-import qiwi.conveyor.dto.ScoringDataDTO;
+import qiwi.deal.dto.CreditDTO;
+import qiwi.deal.dto.LoanApplicationRequestDTO;
+import qiwi.deal.dto.LoanOfferDTO;
+import qiwi.deal.dto.ScoringDataDTO;
 
 import javax.validation.Valid;
 import java.util.List;

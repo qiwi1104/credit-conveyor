@@ -5,15 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import qiwi.conveyor.dto.*;
-import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
-import qiwi.conveyor.exceptions.InvalidScoringDataException;
 import qiwi.deal.client.ConveyorClient;
-import qiwi.deal.dto.FinishRegistrationRequestDTO;
+import qiwi.deal.dto.*;
 import qiwi.deal.entity.PaymentScheduleElement;
 import qiwi.deal.entity.*;
 import qiwi.deal.enums.Status;
 import qiwi.deal.exceptions.InvalidFinishRegistrationRequestException;
+import qiwi.deal.exceptions.InvalidLoanApplicationRequestException;
+import qiwi.deal.exceptions.InvalidScoringDataException;
 import qiwi.deal.mapper.CreditMapper;
 import qiwi.deal.mapper.EmploymentMapper;
 import qiwi.deal.mapper.LoanOfferMapper;
@@ -256,10 +255,11 @@ public class DealService {
         return scoringData;
     }
 
-    private List<PaymentScheduleElement> createPaymentSchedule(List<qiwi.conveyor.dto.PaymentScheduleElement> paymentScheduleElementsDTO) {
+    private List<PaymentScheduleElement> createPaymentSchedule(
+            List<qiwi.deal.dto.PaymentScheduleElement> paymentScheduleElementsDTO) {
         List<PaymentScheduleElement> paymentScheduleElements = new ArrayList<>();
 
-        for (qiwi.conveyor.dto.PaymentScheduleElement paymentScheduleElementDTO : paymentScheduleElementsDTO) {
+        for (qiwi.deal.dto.PaymentScheduleElement paymentScheduleElementDTO : paymentScheduleElementsDTO) {
             PaymentScheduleElement paymentScheduleElement = paymentScheduleElementMapper
                     .mapToEntity(paymentScheduleElementDTO);
 
@@ -279,7 +279,8 @@ public class DealService {
                 creditDTO.getPaymentSchedule());
 
         setCreditToPaymentScheduleElements(paymentScheduleElements, credit);
-        credit.setPaymentSchedule(paymentScheduleElements);
+        credit.getPaymentSchedule().clear();
+        credit.getPaymentSchedule().addAll(paymentScheduleElements);
 
         log.trace("Payment schedule created: {}", paymentScheduleElements);
 

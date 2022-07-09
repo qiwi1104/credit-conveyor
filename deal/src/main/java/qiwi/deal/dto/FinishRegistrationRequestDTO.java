@@ -1,9 +1,8 @@
 package qiwi.deal.dto;
 
 import lombok.Data;
-import qiwi.conveyor.dto.EmploymentDTO;
-import qiwi.conveyor.enums.Gender;
-import qiwi.conveyor.enums.MaritalStatus;
+import qiwi.deal.enums.Gender;
+import qiwi.deal.enums.MaritalStatus;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

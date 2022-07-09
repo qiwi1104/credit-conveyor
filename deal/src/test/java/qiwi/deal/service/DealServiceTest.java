@@ -11,11 +11,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import qiwi.conveyor.dto.CreditDTO;
-import qiwi.conveyor.dto.LoanApplicationRequestDTO;
-import qiwi.conveyor.dto.LoanOfferDTO;
-import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
-import qiwi.conveyor.exceptions.InvalidScoringDataException;
+import qiwi.deal.dto.CreditDTO;
+import qiwi.deal.dto.LoanApplicationRequestDTO;
+import qiwi.deal.dto.LoanOfferDTO;
+import qiwi.deal.exceptions.InvalidLoanApplicationRequestException;
+import qiwi.deal.exceptions.InvalidScoringDataException;
 import qiwi.deal.client.ConveyorClient;
 import qiwi.deal.dto.FinishRegistrationRequestDTO;
 import qiwi.deal.entity.*;
@@ -228,7 +228,7 @@ public class DealServiceTest {
                 LoanOfferDTO[].class);
         expectedCreditResponse = loadExpectedResponse("finish-registration/credit_response.json",
                 CreditDTO.class);
-        for (qiwi.conveyor.dto.PaymentScheduleElement payment : expectedCreditResponse.getPaymentSchedule()) {
+        for (qiwi.deal.dto.PaymentScheduleElement payment : expectedCreditResponse.getPaymentSchedule()) {
             payment.setDate(LocalDate.now().plusMonths(payment.getNumber() - 1));
         }
 

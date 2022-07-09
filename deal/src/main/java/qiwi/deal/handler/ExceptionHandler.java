@@ -3,9 +3,9 @@ package qiwi.deal.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import qiwi.conveyor.dto.ErrorMessageDTO;
-import qiwi.conveyor.exceptions.InvalidLoanApplicationRequestException;
-import qiwi.conveyor.exceptions.InvalidScoringDataException;
+import qiwi.deal.dto.ErrorMessageDTO;
+import qiwi.deal.exceptions.InvalidLoanApplicationRequestException;
+import qiwi.deal.exceptions.InvalidScoringDataException;
 import qiwi.deal.exceptions.InvalidFinishRegistrationRequestException;
 
 @RestControllerAdvice

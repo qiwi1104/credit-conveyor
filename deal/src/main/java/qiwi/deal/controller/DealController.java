@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import qiwi.conveyor.dto.LoanApplicationRequestDTO;
-import qiwi.conveyor.dto.LoanOfferDTO;
 import qiwi.deal.dto.FinishRegistrationRequestDTO;
+import qiwi.deal.dto.LoanApplicationRequestDTO;
+import qiwi.deal.dto.LoanOfferDTO;
 import qiwi.deal.service.DealService;
 
 import javax.validation.Valid;
@@ -38,8 +38,8 @@ public class DealController {
     @PutMapping("/deal/calculate/{applicationId}")
     public void finishRegistration(@Valid @RequestBody FinishRegistrationRequestDTO finishRegistrationRequest,
                                    BindingResult result,
-                                   @PathVariable Long id) {
+                                   @PathVariable Long applicationId) {
 
-        service.finishRegistration(finishRegistrationRequest, result, id);
+        service.finishRegistration(finishRegistrationRequest, result, applicationId);
     }
 }
