@@ -15,11 +15,11 @@ public class LoanApplicationRequestDTO {
     @NotNull
     private Integer term;
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "[A-Za-z]+")
+    @Pattern(regexp = "[A-Za-zА-Яа-я]+")
     @NotNull
     private String firstName;
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "[A-Za-z]+")
+    @Pattern(regexp = "[A-Za-zА-Яа-я]+")
     @NotNull
     private String lastName;
     private String middleName;
