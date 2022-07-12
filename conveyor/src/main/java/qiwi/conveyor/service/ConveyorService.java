@@ -271,17 +271,17 @@ public class ConveyorService {
 
     public List<LoanOfferDTO> getLoanOffers(LoanApplicationRequestDTO loanApplicationRequest,
                                             BindingResult result) {
-//        log.trace("Received loan application request: {}.", loanApplicationRequest);
+        log.trace("Received loan application request: {}.", loanApplicationRequest);
 
-//        isErrorsPresent(loanApplicationRequest, result);
+        isErrorsPresent(loanApplicationRequest, result);
 
-//        if (prescoringPassed(loanApplicationRequest, result)) {
-//            log.trace("Loan application request has passed pre-scoring.");
+        if (prescoringPassed(loanApplicationRequest, result)) {
+            log.trace("Loan application request has passed pre-scoring.");
             return generateLoanOffers(loanApplicationRequest);
-//        } else {
-//            log.trace("Loan application request has not passed pre-scoring.");
-//            return new ArrayList<>();
-//        }
+        } else {
+            log.trace("Loan application request has not passed pre-scoring.");
+            return new ArrayList<>();
+        }
     }
 
     public CreditDTO getCredit(ScoringDataDTO scoringData, BindingResult result) {
