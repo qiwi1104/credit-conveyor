@@ -1,0 +1,38 @@
+[
+  {
+    "requestedAmount": 800000.00,
+    "totalAmount": 921847.44,
+    "term": 24,
+    "monthlyPayment": 38410.31,
+    "rate": 14.00,
+    "isInsuranceEnabled": false,
+    "isSalaryClient": false
+  },
+  {
+    "requestedAmount": 800000.00,
+    "totalAmount": 912803.04,
+    "term": 24,
+    "monthlyPayment": 38033.46,
+    "rate": 13.00,
+    "isInsuranceEnabled": false,
+    "isSalaryClient": true
+  },
+  {
+    "requestedAmount": 900000.00,
+    "totalAmount": 1006729.20,
+    "term": 24,
+    "monthlyPayment": 41947.05,
+    "rate": 11.00,
+    "isInsuranceEnabled": true,
+    "isSalaryClient": false
+  },
+  {
+    "requestedAmount": 900000.00,
+    "totalAmount": 996730.32,
+    "term": 24,
+    "monthlyPayment": 41530.43,
+    "rate": 10.00,
+    "isInsuranceEnabled": true,
+    "isSalaryClient": true
+  }
+]
