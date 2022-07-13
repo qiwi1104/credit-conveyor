@@ -1,0 +1,52 @@
+{
+  "id": 1,
+  "client": {
+    "id": 1,
+    "lastName": "lastName",
+    "firstName": "firstName",
+    "middleName": "middleName",
+    "birthDate": "2001-04-11",
+    "email": "test@gmail.com",
+    "gender": null,
+    "maritalStatus": null,
+    "dependentAmount": null,
+    "passport": {
+      "id": 1,
+      "series": "6314",
+      "number": "128312",
+      "issueDate": null,
+      "issueBranch": null
+    },
+    "employment": null,
+    "account": null
+  },
+  "credit": null,
+  "status": "APPROVED",
+  "creationDate": null,
+  "appliedOffer": {
+    "applicationId": 1,
+    "requestedAmount": 800000.00,
+    "totalAmount": 912803.04,
+    "term": 24,
+    "monthlyPayment": 38033.46,
+    "rate": 13.00,
+    "isInsuranceEnabled": false,
+    "isSalaryClient": true
+  },
+  "signDate": null,
+  "sesCode": null,
+  "applicationStatusHistory": [
+    {
+      "id": 1,
+      "status": "PREAPPROVAL",
+      "time": null,
+      "changeType": "AUTOMATIC"
+    },
+    {
+      "id": 2,
+      "status": "APPROVED",
+      "time": null,
+      "changeType": "AUTOMATIC"
+    }
+  ]
+}

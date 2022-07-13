@@ -1,0 +1,16 @@
+{
+  "gender": "MALE",
+  "passportIssueDate": "2021-04-24",
+  "passportIssueBranch": "MVD Rossii",
+  "maritalStatus": "SINGLE",
+  "dependentAmount": 0,
+  "employment": {
+    "employmentStatus": "EMPLOYED",
+    "employerINN": "123456789012",
+    "salary": 40000,
+    "position": "GRASSROOTS",
+    "workExperienceTotal": "13",
+    "workExperienceCurrent": "4"
+  },
+  "account": "12345678901234567890"
+}

@@ -43,7 +43,7 @@ public class ConveyorService {
 
     public boolean isValidMiddleName(String middleName) {
         if (middleName != null) {
-            return middleName.matches("[A-Za-z]+")
+            return middleName.matches("[A-Za-zА-Яа-я]+")
                     && middleName.length() >= MIN_NAME_LENGTH
                     && middleName.length() <= MAX_NAME_LENGTH;
         }

@@ -1,15 +1,19 @@
-package qiwi.conveyor.dto;
+package qiwi.deal.dto;
 
 import lombok.Data;
 import lombok.ToString;
+import qiwi.deal.enums.Gender;
+import qiwi.deal.enums.MaritalStatus;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @ToString
-public class LoanApplicationRequestDTO {
+public class ScoringDataDTO {
     @NotNull
     private BigDecimal amount;
     @NotNull
@@ -23,9 +27,8 @@ public class LoanApplicationRequestDTO {
     @NotNull
     private String lastName;
     private String middleName;
-    @Pattern(regexp = "[\\w\\.]{2,50}@[\\w\\.]{2,20}")
     @NotNull
-    private String email;
+    private Gender gender;
     @NotNull
     private LocalDate birthdate;
     @Pattern(regexp = "\\d{4}")
@@ -34,4 +37,20 @@ public class LoanApplicationRequestDTO {
     @Pattern(regexp = "\\d{6}")
     @NotNull
     private String passportNumber;
+    @NotNull
+    private LocalDate passportIssueDate;
+    @NotNull
+    private String passportIssueBranch;
+    @NotNull
+    private MaritalStatus maritalStatus;
+    @NotNull
+    private Integer dependentAmount;
+    @NotNull
+    private EmploymentDTO employment;
+    @NotNull
+    private String account;
+    @NotNull
+    private Boolean isInsuranceEnabled;
+    @NotNull
+    private Boolean isSalaryClient;
 }
