@@ -1,0 +1,403 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-employments
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: employments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: employments_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: employment_status
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: employer
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: salary
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: position
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: work_experience_total
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: work_experience_current
+                  type: integer
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-passports
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: passports
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: passports_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: series
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: number
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: issue_date
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: issue_branch
+                  type: character varying
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-loan-offers
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: loan_offers
+            columns:
+              - column:
+                  name: application_id
+                  type: bigint
+                  autoIncrement: false
+                  constraints:
+                    primaryKeyName: loan_offers_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: requested_amount
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: total_amount
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: term
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: monthly_payment
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: rate
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_insurance_enabled
+                  type: boolean
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_salary_client
+                  type: boolean
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-clients
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: clients
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: clients_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: first_name
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: middle_name
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: email
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: gender
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: marital_status
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: dependent_amount
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: passport_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: passport_id_fkey
+                    references: passports(id)
+              - column:
+                  name: employment_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: employment_id_fkey
+                    references: employments(id)
+              - column:
+                  name: account
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: birth_date
+                  type: date
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-credits
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: credits
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: credits_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: amount
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: term
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: monthly_payment
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: rate
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: psk
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_insurance_enabled
+                  type: boolean
+                  constraints:
+                    nullable: true
+              - column:
+                  name: is_salary_client
+                  type: boolean
+                  constraints:
+                    nullable: true
+              - column:
+                  name: credit_status
+                  type: character varying
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-applications
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: applications
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: applications_id_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: status
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: creation_date
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: applied_offer_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: applied_offer_id_fkey
+                    references: loan_offers(application_id)
+              - column:
+                  name: sign_date
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: ses_code
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: client_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: client_id_fkey
+                    references: clients(id)
+              - column:
+                  name: credit_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: credit_id_applications_fkey
+                    references: credits(id)
+  - changeSet:
+      id: create-applications-status-history
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: applications_status_history
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: applications_status_history_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: application_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: character varying
+                  constraints:
+                    nullable: true
+              - column:
+                  name: time
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: change_type
+                  type: character varying
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: create-payments
+      author: Nikita Timyashov
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKeyName: payments_id_pkey
+                    unique: true
+                    nullable: false
+              - column:
+                  name: number
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: true
+              - column:
+                  name: total_payment
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: interest_payment
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: debt_payment
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: remaining_debt
+                  type: numeric
+                  constraints:
+                    nullable: true
+              - column:
+                  name: credit_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: credit_id_fkey
+                    references: credits(id)
